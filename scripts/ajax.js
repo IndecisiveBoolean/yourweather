@@ -10,25 +10,40 @@ Change final else statement in the iconSetter function to something more appropr
 Change default font to something functional but better looking.
 */
 
-
 const temperatureHTML = document.querySelector("#temperature");
-const townHTML = document.querySelector('#location');
+const townHTML = document.querySelector("#location");
 const humidityHTML = document.querySelector("#humidity");
 const windHTML = document.querySelector("#wind")
 const windDirectionHTML = document.querySelector("#direction");
 const weatherIcon = document.querySelector("#conditions-icon");
-let currentWeatherDesc = document.querySelector("#current-weather");
+const currentWeatherDescHTML = document.querySelector("#current-weather");
+const weatherSearch = document.querySelector("#weather-search");
+const allHTML = document.querySelector("html");
 
 let key = "f46c141e52207ddd839a3255fe799a29"; // api key for weather info
-const userLocation = []; //contains the location of the user
-let temp = [] // Contains the temperature data found in weatherResponse
-let desc = [] // Contains the weather description data found in weatherResponse
-let wind = [] // Contains the wind speed data found in weatherResponse
-let windDirection = []// Contains the wind direction data found in weatherResponse
-let humidity = [] // Contains the humidity data found in weatherResponse
-let userTownName = [] // Contains the town name/location data found in weatherResponse
-let weatherIconId = ''; // Contains the ID data found in weatherResponse used for Icon updates
-let weatherResponse = [] // Contains the the response text from the weatherData AJAX request
+let weatherResponse = [] // Contains the the response text from the weatherData AJAX request.
+
+class userWeather {
+  constructor(temp, desc, wind, windDirection, humidity, userTownName, weatherIcon) {
+    this.temp = temp;
+    this.desc = desc;
+    this.wind = wind;
+    this.windDirection = windDirection;
+    this.humidity = humidity;
+    this.userTownName = userTownName;
+    this.weatherIcon = weatherIcon;
+  }
+}
+
+// Listens for ENTER key keypress and calls the getWeatherZip function passing the value of the input field are an argument.
+allHTML.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    
+    getWeatherZip(weatherSearch.value);
+    weatherSearch.value = '';
+  }
+});
 
 //====    LOCATION GETTER    ==== //
 
@@ -43,8 +58,12 @@ function error() {
   alert("That's weird. We couldn't find you!")
 };
 
-// Is called on success taking the coords of the user's current location and opens an AJAX request using the openweathermap API.
+//====    /LOCATION GETTER    ==== //
+
+
+// Is called on location get success. Uses coordinates of the user's current location and opens an AJAX request using the openweathermap API.
 function success(position) {
+  let userLocation = []; //contains the location of the user
   userLocation.lat = position.coords.latitude;
   userLocation.lng = position.coords.longitude;
   
@@ -52,45 +71,63 @@ function success(position) {
     weatherData.onreadystatechange = function () {
       if (weatherData.readyState === 4 && weatherData.status === 200) {
         weatherResponse = JSON.parse(weatherData.responseText);
-        unitSelection = weatherResponse.sys.country;
+        if (weatherResponse.sys.country === "US") {
+          temperatureHTML.innerText = "F";
+        } else {
+          temperatureHTML.innerText = "C";
+        };
         setWeatherInfo();
         currentWeatherIconSetter();
       }
     };
-    weatherData.open('GET', 'https://api.openweathermap.org/data/2.5/weather?lat=' + userLocation.lat + '&lon=' + userLocation.lng + '&units=imperial&APPID=' + key);
+    weatherData.open('GET', 'https://api.openweathermap.org/data/2.5/weather?lat=' + userLocation.lat + '&lon=' + userLocation.lng + `&units=imperial&APPID=` + key);
     weatherData.send();
 }
 
+function getWeatherZip(zip) {
+  weatherDataZip = new XMLHttpRequest();
+  weatherDataZip.onreadystatechange = function () {
+    if (weatherDataZip.readyState === 4 && weatherDataZip.status === 200) {
+      weatherResponse = JSON.parse(weatherDataZip.responseText);
+      unitSelection = weatherResponse.sys.country;
+      if (unitSelection === "US") {
+        unitSelection = "imperial";
+      } else {
+        unitSelection = "metric";
+      };
+      setWeatherInfo();
+      currentWeatherIconSetter();
+    }
+  };
+  weatherDataZip.open('GET', `https://api.openweathermap.org/data/2.5/weather?zip=${zip}` + `&units=imperial&APPID=` + key);
+  weatherDataZip.send();
+};
+
 
 function setWeatherInfo () {
-  temp = weatherResponse.main.temp;
-  temperatureHTML.textContent = temp;
+  //calls the cardDirectionConvert function with an argument of the value of property weatherResponse.wind.deg to convert to a proper cardinal direction.
+  let windDirection = cardDirectionConvert(weatherResponse.wind.deg); 
+  // Creates a new object using the userWeather class constructor.
+  let weatherInformation = new userWeather(weatherResponse.main.temp, weatherResponse.weather[0].description, weatherResponse.wind.speed, windDirection, weatherResponse.main.humidity, weatherResponse.name, weatherResponse.weather[0].icon);
+  // Assigns the proper text/values to the HTML elements using the weatherInformation object.
+  temperatureHTML.textContent = weatherInformation.temp;
 
-  desc = weatherResponse.weather[0].description;
-  currentWeatherDesc.textContent = desc;
+  currentWeatherDescHTML.textContent = weatherInformation.desc;
 
   weatherIconId = weatherResponse.weather[0].id;
 
-  userTownName = weatherResponse.name;
-  townHTML.textContent = userTownName;
+  townHTML.textContent = weatherInformation.userTownName;
 
-  wind = weatherResponse.wind.speed;
-  windHTML.textContent = wind;
-  windDirection = weatherResponse.wind.deg;
-  windDirection = cardDirectionConvert(windDirection); //calls the cardDirectionConvert function with the value of windDirection as arguement
-  windDirectionHTML.textContent = windDirection;
+  windHTML.textContent = weatherInformation.wind;
+  windDirectionHTML.textContent = weatherInformation.windDirection;
 
-
-  humidity = weatherResponse.main.humidity;
-  humidityHTML.textContent = humidity;   
+  humidityHTML.textContent = weatherInformation.humidity;   
 };
 
-//====    /LOCATION GETTER    ==== //
 
+//====    WIND DIRECTION DEGREES TO CARDINAL CONVERSION FUNCTION    ====//
 
-//====    WIND DIRECTION DEG TO CARDINAL COVERT FUNCTION    ==== //
-
-// Converts the interger value of the deg property returned from weatherData AJAX request to a cardinal direction. North, South, North East, etc...
+// Converts the int value of the deg property returned from weatherData AJAX request to a cardinal direction. North, South, North East, etc...
 function cardDirectionConvert(deg) {
   if (deg>11.25 && deg<33.75){
     return "NNE";
@@ -168,6 +205,5 @@ function currentWeatherIconSetter() {
       console.log("no it broke");
     }
 }
-
 
 //====    /WEATHER ICON SELECTOR    ==== //

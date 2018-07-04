@@ -29,6 +29,17 @@ body {
   margin-bottom: 200px;
 }
 
+.search-container {
+  width: 70%;
+  padding-bottom: 20px;
+  
+  margin: 0px 66px 0px 68px;
+}
+
+#weather-search {
+  width: 100%;
+  border-radius: 10px;
+}
 
 .header-top {
   margin-bottom: 0px;
