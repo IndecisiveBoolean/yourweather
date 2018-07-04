@@ -39,9 +39,12 @@ class userWeather {
 allHTML.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
-    
-    getWeatherZip(weatherSearch.value);
-    weatherSearch.value = '';
+    if (weatherSearch.value === '' || weatherSearch.value === ' ') {
+      alert("The input field is empty!");
+    } else {
+      getWeatherZip(weatherSearch.value);
+      weatherSearch.value = ''; 
+    }
   }
 });
 
