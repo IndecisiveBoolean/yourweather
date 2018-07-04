@@ -21,9 +21,6 @@ body {
   display: flex;
   flex-direction: column;
   
-  border: solid 1px white;
-  border-radius: 10px;
-  
   height: auto;
   width: 450px;
   margin-bottom: 200px;
@@ -73,6 +70,9 @@ body {
   background-color: rgba(51, 173, 255, .5);
   color: white;
   border-radius: 9px 9px 9px 9px;
+  
+  border: solid 1px white;
+  border-radius: 10px;
   
   text-align: center;
   font-size: 14px;
