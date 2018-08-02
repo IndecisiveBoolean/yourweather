@@ -102,7 +102,7 @@ function getWeatherZip(zip) {
       currentWeatherIconSetter();
     }
   };
-  weatherDataZip.open('GET', `https://api.openweathermap.org/data/2.5/weather?zip=${zip}` + `&units=imperial&APPID=` + key);
+  weatherDataZip.open('GET', `https://api.openweathermap.org/data/2.5/weather?zip=${zip}` + `&units=${unitSelection}&APPID=` + key);
   weatherDataZip.send();
 };
 
