@@ -21,16 +21,17 @@ body {
   display: flex;
   flex-direction: column;
   
-  height: auto;
-  width: 450px;
-  margin-bottom: 200px;
+  width: 40%;
+  margin-bottom: 400px;
 }
 
 .search-container {
-  width: 70%;
+  display: flex;
+  justify-content: center;
+  width: 80%;
   padding-bottom: 20px;
   
-  margin: 0px 66px 0px 68px;
+  margin: 0 auto;
 }
 
 #weather-search {
@@ -66,7 +67,6 @@ body {
 }
 
 .widget-background {
-  position: relative;
   background-color: rgba(51, 173, 255, .5);
   color: white;
   border-radius: 9px 9px 9px 9px;

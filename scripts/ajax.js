@@ -54,7 +54,7 @@ allHTML.addEventListener("keydown", (event) => {
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(success, error);
 } else {
-  alert('Geolocation is not supported');
+  alert('Geolocation is not supported or you did not allow your location to be seen.');
 }
 
 function error() {
@@ -203,9 +203,6 @@ function currentWeatherIconSetter() {
     }
   else if (weatherIconId == 803 || weatherIconId == 804) {
       weatherIcon.src= "https://openweathermap.org/img/w/04d.png";
-    }
-  else {
-      console.log("no it broke");
     }
 }
 
